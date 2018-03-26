@@ -20,11 +20,7 @@ public class Solver
 		solutions = new ArrayList<>();
 		solveRecurse(problem);
 	}
-	
-		
-	// 
-	// FINISH THIS.
-	//
+
 	// Standard backtracking recursive solver.
 	//
 	private void solveRecurse(Grid grid)
@@ -50,9 +46,7 @@ public class Solver
 			}
 		}
 	}
-	
-	//
-	// COMPLETE THIS
+
 	//
 	// Returns Evaluation.ABANDON if the grid is illegal. 
 	// Returns ACCEPT if the grid is legal and complete.
@@ -60,10 +54,10 @@ public class Solver
 	//
 	public Evaluation evaluate(Grid grid)
 	{
-		if (grid.isFull() && grid.isLegal()) {
+		if (grid.isFull()) {
 			return Evaluation.ACCEPT;
 		}
-		else if (!grid.isFull()) {
+		else if (!grid.isLegal()) {
 			return Evaluation.ABANDON;
 		}
 		else {
@@ -86,6 +80,10 @@ public class Solver
 		solver.solve();
 		
 		// Print out your solution, or test if it equals() the solution in TestGridSupplier.
-		System.out.println(g.toString());
+		for (Grid solution: solver.solutions) {
+			System.out.println(solution);
+		}
+		
+		System.out.print("Number of Solutions: " + solver.solutions.size());
 	}
 }

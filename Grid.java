@@ -65,8 +65,24 @@ public class Grid
 			for (int i=0; i<9; i++)
 				values[j][i] = src.values[j][i];
 	}
-	
-	
+
+	//
+	// Helper method for next9Grids
+	//
+	private int[] yxCell()
+	{
+		int[] yx = new int[2];
+		
+		// Search every member of values[][], looking for  zero.
+		for (yx[0]=0; yx[0]<9; yx[0]++)
+			for (yx[1]=0; yx[1]<9; yx[1]++)
+				if (values[yx[0]][yx[1]] == 0)
+					return yx;
+		
+		return null;
+	}
+
+
 	//
 	// Finds an empty member of values[][]. Returns an array list of 9 grids that look like the current grid,
 	// except the empty member contains 1, 2, 3 .... 9. Returns null if the current grid is full. Don’t change
@@ -74,33 +90,19 @@ public class Grid
 	//
 	public ArrayList<Grid> next9Grids()
 	{
-		int xOfNextEmptyCell = -5; //-5 because of random negative
-		int yOfNextEmptyCell = -5;
-
 		// Finds the x,y of an empty cell.
-		for (int i=0; i<9; i++) {
-			for (int j=0; j<9; j++) {
-				if (values[i][j]==0) {
-					xOfNextEmptyCell = i;
-					yOfNextEmptyCell = j;
-					//break;
-				}
-			}
-			//if (i==xOfNextEmptyCell) {
-			//	break;
-			//}
-		}
+		int[] yxNext = yxCell();
+		int xOfNextEmptyCell = yxNext[0];
+		int yOfNextEmptyCell = yxNext[1];
 
 		// Construct array list to contain 9 new grids.
 		ArrayList<Grid> grids = new ArrayList<Grid>();
 
 		// Create 9 new grids as described in the comments above. Add them to grids.
-		int added = 1;
-		for (int i=0; i<9; i++) {
+		for (int i=1; i<9; i++) {
 			Grid add = new Grid(this);
-			add.values[xOfNextEmptyCell][yOfNextEmptyCell]=added;
+			add.values[xOfNextEmptyCell][yOfNextEmptyCell]=i;
 			grids.add(add);
-			added++;
 		}
 
 		return grids;
@@ -110,15 +112,18 @@ public class Grid
 	// Helper method for isLegal()
 	//
 	private boolean repeats(int[] in) {
-		Arrays.sort(in);
-		for (int i=0; i<in.length; i++) {
-			for (int j = i + 1; j < in.length-1; j++) {
-				if (in[i] ==0) {
-					break;
-				}
-				if (in[i] == in[j]) {
-					return true;
-				}
+		boolean[] observed = new boolean[10];
+		
+		for (int i: in)
+		{
+			if (i == 0) {
+				continue; // repeated 0s are good, so ignore 0s
+			}
+			else if (observed[i]) {
+				return true;			// i has been seen before
+			}
+			else {
+				observed[i] = true;		// first observation of i
 			}
 		}
 		return false;
@@ -130,124 +135,50 @@ public class Grid
 	//
 	public boolean isLegal()
 	{
-		// Check every row. If you find an illegal row, return false.
-		for (int i=0; i<9; i++) {
-			int[] tmp = new int[9];
-			for (int j=0; j<9; j++) {
-				tmp[j] = values[i][j];
-			}
-			if (repeats(tmp) == false) {
-				//System.out.println("Row"); //debug
+		// Check all rows.
+		for (int j=0; j<9; j++)
+		{
+			int[] ints = new int[9];
+			for (int i=0; i<9; i++)
+				ints[i] = values[j][i];
+			if (repeats(ints))
 				return false;
-			}
 		}
-
-		// Check every column. If you find an illegal column, return false.
-		for (int i=0; i<9; i++) {
-			int[] temp = new int[9];
-			for (int j=0; j<9; j++) {
-				temp[j] = values[j][i];
-			}
-			if (repeats(temp) == false) {
-				//System.out.println("Col"); //debug
+		
+		// Check all cols.
+		for (int j=0; j<9; j++)
+		{
+			int[] ints = new int[9];
+			for (int i=0; i<9; i++)
+				ints[i] = values[i][j];
+			if (repeats(ints))
 				return false;
-			}
 		}
-
-		// Check every block. If you find an illegal block, return false.
-		///// METHOD 1
-		/*
-		for (int i=0; i<9; i+=3) {
-			int[] tmp = new int[9];
-			for (int j=0; j<9; j+=3) {
-				//Cells
-				int increment = 0;
-				for (int k=i; k<(i+3); k++) {
-					for (int l=j; l<(j+3); l++) {
-						tmp[increment] = values[i][j];
-						increment++;
-					}
-				}
-				if (repeats(tmp) == false) {
-					//System.out.println("Block"); //debug
-					return false;
-				}
-			}
-		}
-		*/
-		////// METHOD 2
-		/*
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				int[] tmp = new int[9];
-				int counter = 0;
-				for (int k = j * 3; k < j * 3 + 3; k++) {
-					for (int l = i * 3; l < i * 3 + 3; l++) {
-						tmp[counter] = values[k][l];
-						counter++;
-					}
-				}
-				if (repeats(tmp) == true)
-					return false;
-			}
-		}
-		*/
-		//////////////////////////////////
-		//// METHOD 3 
-				int rowStart = 0;
-				int rowStop  = 3;
-				
-				int colStart = 0;
-				int colStop  = 3;
-				
-				// Loops through the 9 blocks of a sudoku puzzle starting from upper left. 
-				// Checks by starting from top to bottom of each column of blocks
-				for (int i = 1; i <= 9; i++)
+		
+		// Check all blocks. The two outer loops generate j = { 0, 3, 6 } and i = { 0, 3, 6 }.
+		// These i,j pairs are the upper-left corners of each zone. The two inner loops compute
+		// all 9 index pairs for the cells in the zone defined by i,j.
+		for (int j=0; j<9; j+=3)
+		{
+			for (int i=0; i<9; i+=3)
+			{
+				int[] ints = new int[9];
+				int n = 0;
+				for (int jj=j; jj<j+3; jj++)
 				{
-					int index = 0;
-					int[] compareValues = new int[9];
-					
-					// Fills compareValues with the values of a block
-					for (int row = rowStart; row < rowStop; row++)
+					for (int ii=i; ii<i+3; ii++)
 					{
-						for (int col = colStart; col < colStop; col++)
-						{
-							compareValues[index] = values[row][col];
-							index++;
-						}
-					}
-					
-					// Checks if there is a repeated value. Returns true if repeats are found.
-					if(repeats(compareValues) == false)
-					{
-						return false;
-					}
-					else 
-					{
-						// If the bottom block is reached, the next column of blocks will be checked starting from the top
-						// else, rowStop and rowStart is incremented by 3 to check the next block.
-						// When the bottom block is reached, rowStop and rowStart will reset and colStop and colStart will be 
-						// incremented by 3 to move to the next column of blocks
-						if (rowStop == 9 && rowStart == 6)
-						{
-							rowStop  = 3;
-							rowStart = 0;
-							colStop  += 3;
-							colStart += 3;
-						}
-						else
-						{
-							rowStop  += 3;
-							rowStart += 3;
-						}
+						ints[n++] = values[jj][ii];
+						if (repeats(ints))
+							return false;
 					}
 				}
-		//////////////////////////////////
-
-		// All rows/cols/blocks are legal.
+			}
+		}
+		
 		return true;
-	}
 
+	}
 	
 	//
 	// Returns true if every cell member of values[][] is a digit from 1-9.
@@ -283,4 +214,12 @@ public class Grid
 		return true;
 	}
 	
+	public static void main(String[] args) {
+		Grid g = TestGridSupplier.getPuzzle1();
+		System.out.println("ORIGINAL GRID:\n" + g);
+		ArrayList<Grid> nexts = g.next9Grids();
+		for (Grid next: nexts) {
+			System.out.println("-------\n" + next);
+		}
+	}
 }
