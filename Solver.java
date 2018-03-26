@@ -64,7 +64,7 @@ public class Solver
 		if (grid.isFull() && grid.isLegal()) {
 			return Evaluation.ACCEPT;
 		}
-		else if (grid.isFull() && !grid.isLegal()) {
+		else if (!grid.isFull()) {
 			return Evaluation.ABANDON;
 		}
 		else {

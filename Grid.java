@@ -97,7 +97,7 @@ public class Grid
 		// Create 9 new grids as described in the comments above. Add them to grids.
 		for (int i=0; i<9; i++) {
 			Grid add = new Grid(this);
-			add.values[xOfNextEmptyCell][yOfNextEmptyCell]=i+8;
+			add.values[xOfNextEmptyCell][yOfNextEmptyCell]=9;
 			grids.add(add);
 		}
 
@@ -111,7 +111,7 @@ public class Grid
 		Arrays.sort(in);
 		for (int i=0; i<in.length; i++) {
 			for (int j = i + 1; j < in.length-1; j++) {
-				if (in[i] !=0) {
+				if (in[i] ==0) {
 					break;
 				}
 				if (in[i] == in[j]) {
@@ -179,12 +179,13 @@ public class Grid
 	{
 		for (int i=0; i<9; i++) {
 			for (int j=0; j<9; j++) {
-				if (values[i][j] != 0) {
-					return true;
+				int val = values[i][j];
+				if (val < 1 || val > 9) {
+					return false;
 				}
 			}
 		}
-		return false;
+		return true;
 	}
 	
 
