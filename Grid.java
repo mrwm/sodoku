@@ -131,8 +131,8 @@ public class Grid
 	public boolean isLegal()
 	{
 		// Check every row. If you find an illegal row, return false.
-		int[] tmp = new int[9];
 		for (int i=0; i<9; i++) {
+			int[] tmp = new int[9];
 			for (int j=0; j<9; j++) {
 				tmp[j] = values[i][j];
 			}
@@ -144,17 +144,20 @@ public class Grid
 
 		// Check every column. If you find an illegal column, return false.
 		for (int i=0; i<9; i++) {
+			int[] temp = new int[9];
 			for (int j=0; j<9; j++) {
-				tmp[j] = values[j][i];
+				temp[j] = values[j][i];
 			}
-			if (repeats(tmp) == false) {
+			if (repeats(temp) == false) {
 				//System.out.println("Col"); //debug
 				return false;
 			}
 		}
 
 		// Check every block. If you find an illegal block, return false.
+		/*
 		for (int i=0; i<9; i+=3) {
+			int[] tmp = new int[9];
 			for (int j=0; j<9; j+=3) {
 				//Cells
 				int increment = 0;
@@ -168,6 +171,21 @@ public class Grid
 					//System.out.println("Block"); //debug
 					return false;
 				}
+			}
+		}
+		*/
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				int[] tmp = new int[9];
+				int counter = 0;
+				for (int k = j * 3; k < j * 3 + 3; k++) {
+					for (int l = i * 3; l < i * 3 + 3; l++) {
+						tmp[counter] = values[k][l];
+						counter++;
+					}
+				}
+				if (repeats(tmp) == true)
+					return false;
 			}
 		}
 
