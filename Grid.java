@@ -83,22 +83,24 @@ public class Grid
 				if (values[i][j]==0) {
 					xOfNextEmptyCell = i;
 					yOfNextEmptyCell = j;
-					break;
+					//break;
 				}
 			}
-			if (i==xOfNextEmptyCell) {
-				break;
-			}
+			//if (i==xOfNextEmptyCell) {
+			//	break;
+			//}
 		}
 
 		// Construct array list to contain 9 new grids.
 		ArrayList<Grid> grids = new ArrayList<Grid>();
 
 		// Create 9 new grids as described in the comments above. Add them to grids.
+		int added = 1;
 		for (int i=0; i<9; i++) {
 			Grid add = new Grid(this);
-			add.values[xOfNextEmptyCell][yOfNextEmptyCell]=9;
+			add.values[xOfNextEmptyCell][yOfNextEmptyCell]=added;
 			grids.add(add);
+			added++;
 		}
 
 		return grids;
@@ -134,7 +136,7 @@ public class Grid
 			for (int j=0; j<9; j++) {
 				tmp[j] = values[i][j];
 			}
-			if (repeats(tmp)) {
+			if (repeats(tmp) == false) {
 				//System.out.println("Row"); //debug
 				return false;
 			}
@@ -145,7 +147,7 @@ public class Grid
 			for (int j=0; j<9; j++) {
 				tmp[j] = values[j][i];
 			}
-			if (repeats(tmp)) {
+			if (repeats(tmp) == false) {
 				//System.out.println("Col"); //debug
 				return false;
 			}
@@ -155,15 +157,17 @@ public class Grid
 		for (int i=0; i<9; i+=3) {
 			for (int j=0; j<9; j+=3) {
 				//Cells
+				int increment = 0;
 				for (int k=i; k<(i+3); k++) {
 					for (int l=j; l<(j+3); l++) {
-						tmp[i] = values[i][j];
+						tmp[increment] = values[i][j];
+						increment++;
 					}
 				}
-			}
-			if (repeats(tmp)) {
-				//System.out.println("Block"); //debug
-				return false;
+				if (repeats(tmp) == false) {
+					//System.out.println("Block"); //debug
+					return false;
+				}
 			}
 		}
 

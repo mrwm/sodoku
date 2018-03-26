@@ -45,8 +45,7 @@ public class Solver
 		{
 			// Here if eval == Evaluation.CONTINUE. Generate all 9 possible next grids. Recursively 
 			// call solveRecurse() on those grids.
-			ArrayList<Grid> nextGrids = grid.next9Grids();
-			for (Grid n: nextGrids) {
+			for (Grid n: grid.next9Grids()) {
 				solveRecurse(n);
 			}
 		}
