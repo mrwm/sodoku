@@ -155,6 +155,7 @@ public class Grid
 		}
 
 		// Check every block. If you find an illegal block, return false.
+		///// METHOD 1
 		/*
 		for (int i=0; i<9; i+=3) {
 			int[] tmp = new int[9];
@@ -174,6 +175,8 @@ public class Grid
 			}
 		}
 		*/
+		////// METHOD 2
+		/*
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				int[] tmp = new int[9];
@@ -188,6 +191,58 @@ public class Grid
 					return false;
 			}
 		}
+		*/
+		//////////////////////////////////
+		//// METHOD 3 
+				int rowStart = 0;
+				int rowStop  = 3;
+				
+				int colStart = 0;
+				int colStop  = 3;
+				
+				// Loops through the 9 blocks of a sudoku puzzle starting from upper left. 
+				// Checks by starting from top to bottom of each column of blocks
+				for (int i = 1; i <= 9; i++)
+				{
+					int index = 0;
+					int[] compareValues = new int[9];
+					
+					// Fills compareValues with the values of a block
+					for (int row = rowStart; row < rowStop; row++)
+					{
+						for (int col = colStart; col < colStop; col++)
+						{
+							compareValues[index] = values[row][col];
+							index++;
+						}
+					}
+					
+					// Checks if there is a repeated value. Returns true if repeats are found.
+					if(repeats(compareValues) == false)
+					{
+						return false;
+					}
+					else 
+					{
+						// If the bottom block is reached, the next column of blocks will be checked starting from the top
+						// else, rowStop and rowStart is incremented by 3 to check the next block.
+						// When the bottom block is reached, rowStop and rowStart will reset and colStop and colStart will be 
+						// incremented by 3 to move to the next column of blocks
+						if (rowStop == 9 && rowStart == 6)
+						{
+							rowStop  = 3;
+							rowStart = 0;
+							colStop  += 3;
+							colStart += 3;
+						}
+						else
+						{
+							rowStop  += 3;
+							rowStart += 3;
+						}
+					}
+				}
+		//////////////////////////////////
 
 		// All rows/cols/blocks are legal.
 		return true;
